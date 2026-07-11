@@ -5,7 +5,7 @@
 #macro WATER_LOSE 0.9
 
 #macro START_RESOURCE 0
-#macro GRACE_SECONDS 10
+#macro GRACE_SECONDS 20
 
 #macro PUMP_HP 60
 #macro PUMP_COST 15
@@ -13,8 +13,8 @@
 
 #macro TURRET_HP 45
 #macro TURRET_COST 20
-#macro TURRET_RANGE 160
-#macro TURRET_FIRE_CD 30
+#macro TURRET_RANGE 250
+#macro TURRET_FIRE_CD 25
 #macro TURRET_DMG 8
 
 #macro ENEMY_HP_BASE 30
@@ -36,6 +36,7 @@
 
 enum GAME_STATE { TITLE, PLAY, OVER }
 enum BUILD_CAT { PRODUCTION, OFFENSE }
+enum BUILD { NONE, MENU, PLACING }
 
 function wave_rise_rate(_w) {
 	return WATER_BASE_RISE * power(1 + WATER_RISE_GROWTH, _w - 1);

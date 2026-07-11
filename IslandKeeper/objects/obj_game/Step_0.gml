@@ -1,5 +1,41 @@
 if (global.state != GAME_STATE.PLAY) exit;
 
+if (global.build == BUILD.NONE) {
+    if (keyboard_check_pressed(ord("B"))) global.build = BUILD.MENU;
+} else if (global.build == BUILD.MENU) {
+    var _gw = display_get_gui_width();
+    var _gh = display_get_gui_height();
+    var _bw = 200; var _bh = 90; var _gap = 40;
+    var _by = _gh / 2 - _bh / 2;
+    var _bx1 = _gw / 2 - _bw - _gap / 2;
+    var _bx2 = _gw / 2 + _gap / 2;
+    var _mgx = device_mouse_x_to_gui(0);
+    var _mgy = device_mouse_y_to_gui(0);
+    var _over1 = (_mgx > _bx1 && _mgx < _bx1 + _bw && _mgy > _by && _mgy < _by + _bh);
+    var _over2 = (_mgx > _bx2 && _mgx < _bx2 + _bw && _mgy > _by && _mgy < _by + _bh);
+    if (mouse_check_button_pressed(mb_left)) {
+        if (_over1)      { global.build_obj = obj_pump;   global.build_cost = PUMP_COST;   global.build = BUILD.PLACING; }
+        else if (_over2) { global.build_obj = obj_turret; global.build_cost = TURRET_COST; global.build = BUILD.PLACING; }
+    }
+    if (keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("B"))) global.build = BUILD.NONE;
+} else {
+    var _cx = mouse_x;
+    var _cy = mouse_y;
+    var _ex = island_r * (1 - global.water_level);
+    var _np = instance_nearest(_cx, _cy, obj_pump);
+    var _nt = instance_nearest(_cx, _cy, obj_turret);
+    var _clear = ((_np == noone) || point_distance(_cx, _cy, _np.x, _np.y) > 28) && ((_nt == noone) || point_distance(_cx, _cy, _nt.x, _nt.y) > 28);
+    global.build_valid = (point_distance(island_x, island_y, _cx, _cy) < _ex - 14) && (global.resource >= global.build_cost) && _clear;
+    if (mouse_check_button_pressed(mb_left) && global.build_valid) {
+        global.resource -= global.build_cost;
+        instance_create_layer(_cx, _cy, "Instances", global.build_obj);
+        global.build = BUILD.NONE;
+    }
+    if (mouse_check_button_pressed(mb_right) || keyboard_check_pressed(vk_escape)) global.build = BUILD.NONE;
+}
+
+if (global.build == BUILD.MENU) exit;
+
 if (global.grace_t > 0) {
     global.grace_t -= 1;
 } else {

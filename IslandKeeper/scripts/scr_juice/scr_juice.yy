@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_juice",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_juice",
+  "parent":{
+    "name":"Systems",
+    "path":"folders/Script/Systems.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
