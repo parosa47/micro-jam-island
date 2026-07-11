@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_palette",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_palette",
+  "parent":{
+    "name":"Config",
+    "path":"folders/Script/Config.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
