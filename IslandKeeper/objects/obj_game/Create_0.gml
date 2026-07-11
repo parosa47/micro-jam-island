@@ -1,6 +1,9 @@
 game_set_speed(GAME_FPS, gamespeed_fps);
 draw_set_circle_precision(64);
 depth = 1000;
+enemy_timer = 0;
+wave_to_spawn = wave_enemy_count(global.wave);
+intermission_t = WAVE_PAUSE * GAME_FPS;
 
 global.state = GAME_STATE.PLAY;
 global.water_level = 0;

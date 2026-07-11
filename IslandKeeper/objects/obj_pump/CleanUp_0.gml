@@ -1,0 +1,1 @@
+global.pump_capacity -= PUMP_FLOW;

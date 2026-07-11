@@ -1,0 +1,1 @@
+draw_circle_colour(x, y, 9, merge_colour(COL_ENEMY, c_white, 0.15), COL_ENEMY, false);

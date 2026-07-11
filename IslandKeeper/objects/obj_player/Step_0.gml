@@ -2,6 +2,7 @@ if (global.state != GAME_STATE.PLAY) exit;
 
 var _mx = keyboard_check(vk_right) - keyboard_check(vk_left);
 var _my = keyboard_check(vk_down) - keyboard_check(vk_up);
+var _exposed = obj_game.island_r * (1 - global.water_level);
 
 if (_mx != 0 || _my != 0) {
     var _dir = point_direction(0, 0, _mx, _my);
@@ -15,5 +16,34 @@ if (keyboard_check_pressed(vk_space)) {
     if (_c != noone && point_distance(x, y, _c.x, _c.y) < DIG_RANGE) {
         global.resource += CACHE_RESOURCE;
         with (_c) instance_destroy();
+    }
+}
+
+if (keyboard_check_pressed(ord("1"))) {
+    var _ex = obj_game.island_r * (1 - global.water_level);
+    var _on_land = point_distance(obj_game.island_x, obj_game.island_y, x, y) < _ex - 14;
+    var _np = instance_nearest(x, y, obj_pump);
+    var _clear = (_np == noone) || (point_distance(x, y, _np.x, _np.y) > 28);
+    if (global.resource >= PUMP_COST && _on_land && _clear) {
+        global.resource -= PUMP_COST;
+        instance_create_layer(x, y, "Instances", obj_pump);
+    }
+}
+
+if (point_distance(obj_game.island_x, obj_game.island_y, x, y) > _exposed - 10) {
+    var _bdir = point_direction(obj_game.island_x, obj_game.island_y, x, y);
+    x = obj_game.island_x + lengthdir_x(_exposed - 10, _bdir);
+    y = obj_game.island_y + lengthdir_y(_exposed - 10, _bdir);
+}
+
+aa_timer -= 1;
+if (aa_timer <= 0) {
+    var _e = instance_nearest(x, y, obj_enemy);
+    if (_e != noone && point_distance(x, y, _e.x, _e.y) < PLAYER_AA_RANGE) {
+        aa_timer = GAME_FPS;
+        aa_target = _e;
+        aa_show = 6;
+        var _mult = _e.is_boss ? AA_DMG_BOSS : AA_DMG_NORMAL;
+        _e.hp -= _e.hp_max * _mult;
     }
 }
