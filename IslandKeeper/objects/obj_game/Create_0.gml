@@ -17,6 +17,7 @@ global.upg_bld = noone;
 global.nav = mp_grid_create(0, 0, ceil(room_width / CELL), ceil(room_height / CELL), CELL, CELL);
 global.nav_dirty = true;
 global.nav_version = 0;
+global.testpath = path_add();
 
 island_x = room_width / 2;
 island_y = room_height / 2;

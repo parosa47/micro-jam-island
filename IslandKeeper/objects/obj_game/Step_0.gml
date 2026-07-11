@@ -62,12 +62,26 @@ if (global.build == BUILD.NONE) {
     var _ex = island_r * (1 - global.water_level);
     var _nb = instance_nearest(_cx, _cy, obj_building);
     var _clear = (_nb == noone) || (point_distance(_cx, _cy, _nb.x, _nb.y) > CELL * 0.5);
-    global.build_valid = (point_distance(island_x, island_y, _cx, _cy) < _ex - 14) && (global.resource >= global.build_cost) && _clear;
+    var _on_land = point_distance(island_x, island_y, _cx, _cy) < _ex - 14;
+    var _afford = (global.resource >= global.build_cost);
+
+    var _blocks = false;
+    if (_clear && _on_land && _afford && is_solid_type(global.build_obj)) {
+        var _cxx = floor(_cx / CELL);
+        var _cyy = floor(_cy / CELL);
+        mp_grid_add_cell(global.nav, _cxx, _cyy);
+        with (obj_pump) {
+            if (!mp_grid_path(global.nav, global.testpath, x, y, CELL * 0.5, CELL * 0.5, true)) _blocks = true;
+        }
+        mp_grid_clear_cell(global.nav, _cxx, _cyy);
+    }
+
+    global.build_valid = _clear && _on_land && _afford && !_blocks;
     if (mouse_check_button_pressed(mb_left) && global.build_valid) {
         global.resource -= global.build_cost;
         instance_create_layer(_cx, _cy, "Instances", global.build_obj);
-		global.nav_dirty = true;
         audio_play_sound(snd_place, 6, false);
+        global.nav_dirty = true;
         global.build = BUILD.NONE;
     }
     if (mouse_check_button_pressed(mb_right) || keyboard_check_pressed(vk_escape)) global.build = BUILD.NONE;

@@ -126,3 +126,7 @@ function bld_level(_b) {
 function grid_snap(_v) {
     return floor(_v / CELL) * CELL + CELL * 0.5;
 }
+
+function is_solid_type(_obj) {
+    return (_obj == obj_turret || _obj == obj_sniper || _obj == obj_cannon);
+}
