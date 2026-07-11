@@ -2,7 +2,7 @@ game_set_speed(GAME_FPS, gamespeed_fps);
 draw_set_circle_precision(64);
 depth = 1000;
 
-global.state = GAME_STATE.PLAY;
+global.state = GAME_STATE.TITLE;
 global.water_level = 0;
 global.pump_capacity = 0;
 global.resource = START_RESOURCE;
@@ -18,6 +18,7 @@ global.nav = mp_grid_create(0, 0, ceil(room_width / CELL), ceil(room_height / CE
 global.nav_dirty = true;
 global.nav_version = 0;
 global.testpath = path_add();
+
 
 island_x = room_width / 2;
 island_y = room_height / 2;
@@ -36,6 +37,14 @@ global.build_defs = [
     { obj: obj_cannon,    name: "Cannon",    cost: CANNON_COST },
     { obj: obj_quicksand, name: "Quicksand", cost: QUICKSAND_COST }
 ];
+
+global.enemy_defs = [
+    { hp: 1.0,  spd: 1.0, rad: 9,  col: COL_ENEMY,                    boss: false, drop: 1 },
+    { hp: 0.5,  spd: 1.9, rad: 7,  col: make_colour_rgb(235, 205, 90), boss: false, drop: 1 },
+    { hp: 2.6,  spd: 0.6, rad: 13, col: make_colour_rgb(150, 90, 180), boss: false, drop: 2 },
+    { hp: 14.0, spd: 0.5, rad: 22, col: make_colour_rgb(150, 40, 60),  boss: true,  drop: 12 }
+];
+boss_pending = false;
 
 repeat (CACHE_COUNT) {
     var _a = random(360);

@@ -50,6 +50,7 @@
     {"id":{"name":"rm_game","path":"rooms/rm_game/rm_game.yy",},},
     {"id":{"name":"scr_balance","path":"scripts/scr_balance/scr_balance.yy",},},
     {"id":{"name":"scr_building","path":"scripts/scr_building/scr_building.yy",},},
+    {"id":{"name":"scr_enemy","path":"scripts/scr_enemy/scr_enemy.yy",},},
     {"id":{"name":"scr_juice","path":"scripts/scr_juice/scr_juice.yy",},},
     {"id":{"name":"scr_palette","path":"scripts/scr_palette/scr_palette.yy",},},
     {"id":{"name":"snd_dig","path":"sounds/snd_dig/snd_dig.yy",},},

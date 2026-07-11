@@ -107,10 +107,42 @@ if (global.build == BUILD.CONVERT && instance_exists(global.upg_bld)) {
     draw_set_valign(fa_top);
 }
 
+if (global.state == GAME_STATE.TITLE) {
+    var _gw = display_get_gui_width();
+    var _gh = display_get_gui_height();
+    draw_set_alpha(0.55); draw_set_colour(c_black);
+    draw_rectangle(0, 0, _gw, _gh, false);
+    draw_set_alpha(1);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+    draw_set_colour(COL_SAND);
+    draw_text_transformed(_gw / 2, _gh / 2 - 70, "ISLAND KEEPER", 3, 3, 0);
+    draw_set_colour(c_white);
+    draw_text(_gw / 2, _gh / 2 + 5, "You wash ashore with nothing.");
+    draw_text(_gw / 2, _gh / 2 + 29, "Dig salvage, build defenses, hold back the sea.");
+    draw_set_colour(COL_FOAM);
+    draw_text(_gw / 2, _gh / 2 + 57, "ZQSD move   -   SPACE dig   -   B build");
+    draw_set_colour(c_white);
+    draw_text(_gw / 2, _gh / 2 + 92, "CLICK TO START");
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}
+
 if (global.state == GAME_STATE.OVER) {
-    draw_set_halign(fa_center); draw_set_valign(fa_middle);
-    draw_text(display_get_gui_width() / 2, display_get_gui_height() / 2, "SUBMERGED");
-    draw_set_halign(fa_left); draw_set_valign(fa_top);
+    var _gw = display_get_gui_width();
+    var _gh = display_get_gui_height();
+    draw_set_alpha(0.65); draw_set_colour(make_colour_rgb(20, 50, 74));
+    draw_rectangle(0, 0, _gw, _gh, false);
+    draw_set_alpha(1);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+    draw_set_colour(COL_FOAM);
+    draw_text_transformed(_gw / 2, _gh / 2 - 55, "THE ISLAND DROWNED", 2.5, 2.5, 0);
+    draw_set_colour(c_white);
+    draw_text(_gw / 2, _gh / 2 + 15, "You held on for " + string(global.wave) + " waves");
+    draw_text(_gw / 2, _gh / 2 + 60, "CLICK TO RESTART");
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
 }
 
 if (global.grace_t <= 0 && wave_to_spawn == 0 && instance_number(obj_enemy) == 0) {

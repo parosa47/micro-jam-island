@@ -1,4 +1,11 @@
-if (global.state != GAME_STATE.PLAY) exit;
+if (global.state == GAME_STATE.TITLE) {
+    if (mouse_check_button_pressed(mb_left)) global.state = GAME_STATE.PLAY;
+    exit;
+}
+if (global.state == GAME_STATE.OVER) {
+    if (mouse_check_button_pressed(mb_left)) room_restart();
+    exit;
+}
 
 hover_bld = noone;
 
@@ -140,19 +147,27 @@ if (global.grace_t > 0) {
 
 if (global.grace_t <= 0) {
     if (wave_to_spawn > 0) {
-        enemy_timer -= 1;
-        if (enemy_timer <= 0) {
-            enemy_timer = ENEMY_SPAWN_CD;
-            var _a = random(360);
-            instance_create_layer(island_x + lengthdir_x(island_r + 80, _a), island_y + lengthdir_y(island_r + 80, _a), "Instances", obj_enemy);
-            wave_to_spawn -= 1;
+    enemy_timer -= 1;
+    if (enemy_timer <= 0) {
+        enemy_timer = ENEMY_SPAWN_CD;
+        var _a = random(360);
+        var _sx = island_x + lengthdir_x(island_r + 80, _a);
+        var _sy = island_y + lengthdir_y(island_r + 80, _a);
+        if (boss_pending) {
+            spawn_enemy(_sx, _sy, 3);
+            boss_pending = false;
+        } else {
+            spawn_enemy(_sx, _sy, pick_enemy_type(global.wave));
         }
-    } else if (instance_number(obj_enemy) == 0) {
-        intermission_t -= 1;
-        if (intermission_t <= 0) {
-            global.wave += 1;
-            wave_to_spawn = wave_enemy_count(global.wave);
-            intermission_t = WAVE_PAUSE * GAME_FPS;
-        }
+        wave_to_spawn -= 1;
     }
+} else if (instance_number(obj_enemy) == 0) {
+    intermission_t -= 1;
+    if (intermission_t <= 0) {
+        global.wave += 1;
+        wave_to_spawn = wave_enemy_count(global.wave);
+        if (global.wave mod 5 == 0) boss_pending = true;
+        intermission_t = WAVE_PAUSE * GAME_FPS;
+    }
+}
 }
