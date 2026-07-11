@@ -1,7 +1,23 @@
 if (global.state != GAME_STATE.PLAY) exit;
+hover_bld = noone;
 
 if (global.build == BUILD.NONE) {
     if (keyboard_check_pressed(ord("B"))) global.build = BUILD.MENU;
+
+    var _bp = instance_nearest(mouse_x, mouse_y, obj_pump);
+    var _bt = instance_nearest(mouse_x, mouse_y, obj_turret);
+    var _bd = 22;
+    if (_bp != noone && point_distance(mouse_x, mouse_y, _bp.x, _bp.y) < _bd) { hover_bld = _bp; _bd = point_distance(mouse_x, mouse_y, _bp.x, _bp.y); }
+    if (_bt != noone && point_distance(mouse_x, mouse_y, _bt.x, _bt.y) < _bd) { hover_bld = _bt; }
+
+    if (hover_bld != noone) {
+        if (hover_bld.object_index == obj_pump) {
+            if (mouse_check_button_pressed(mb_left)) upgrade_pump(hover_bld);
+        } else {
+            if (mouse_check_button_pressed(mb_left)) upgrade_turret_stat(hover_bld, true);
+            if (mouse_check_button_pressed(mb_right)) upgrade_turret_stat(hover_bld, false);
+        }
+    }
 } else if (global.build == BUILD.MENU) {
     var _gw = display_get_gui_width();
     var _gh = display_get_gui_height();
@@ -29,6 +45,7 @@ if (global.build == BUILD.NONE) {
     if (mouse_check_button_pressed(mb_left) && global.build_valid) {
         global.resource -= global.build_cost;
         instance_create_layer(_cx, _cy, "Instances", global.build_obj);
+		audio_play_sound(snd_place, 6, false);
         global.build = BUILD.NONE;
     }
     if (mouse_check_button_pressed(mb_right) || keyboard_check_pressed(vk_escape)) global.build = BUILD.NONE;

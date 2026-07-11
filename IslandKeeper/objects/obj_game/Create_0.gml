@@ -17,6 +17,7 @@ global.build_valid = false;
 island_x = room_width / 2;
 island_y = room_height / 2;
 island_r = 520;
+hover_bld = noone;
 
 enemy_timer = 0;
 wave_to_spawn = wave_enemy_count(global.wave);

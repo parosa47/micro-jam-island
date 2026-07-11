@@ -2,7 +2,19 @@ draw_set_colour(c_white);
 var _grace = ceil(global.grace_t / GAME_FPS);
 draw_text(12, 10, "res " + string(global.resource) + "   wave " + string(global.wave) + "   water " + string_format(global.water_level, 1, 2) + "   grace " + string(_grace));
 
-if (global.build == BUILD.NONE) draw_text(12, 30, "ZQSD move   SPACE dig   B build");
+if (global.build == BUILD.NONE) draw_text(12, 30, "ZQSD move   SPACE dig   B build   click a building = upgrade");
+if (global.build == BUILD.NONE) {
+    var _hp = instance_nearest(mouse_x, mouse_y, obj_pump);
+    var _ht = instance_nearest(mouse_x, mouse_y, obj_turret);
+    var _pk = noone; var _hd = 22;
+    if (_hp != noone && point_distance(mouse_x, mouse_y, _hp.x, _hp.y) < _hd) { _pk = _hp; _hd = point_distance(mouse_x, mouse_y, _hp.x, _hp.y); }
+    if (_ht != noone && point_distance(mouse_x, mouse_y, _ht.x, _ht.y) < _hd) { _pk = _ht; }
+    if (_pk != noone) {
+        var _lv = _pk.level;
+        var _s = (_lv < BUILD_MAX_LEVEL) ? ("lvl " + string(_lv) + "  -  upgrade: " + string(round(_pk.base_cost * _lv * UPGRADE_COST_MULT))) : ("lvl " + string(_lv) + "  -  MAX");
+        draw_text(12, 70, _s);
+    }
+}
 else if (global.build == BUILD.PLACING) draw_text(12, 30, "click  place      right-click  cancel");
 
 if (global.build == BUILD.MENU) {
@@ -51,3 +63,13 @@ if (global.state == GAME_STATE.OVER) {
 if (global.grace_t <= 0 && wave_to_spawn == 0 && instance_number(obj_enemy) == 0) {
     draw_text(12, 50, "wave cleared - next in " + string(ceil(intermission_t / GAME_FPS)));
 }
+
+var _rise = wave_rise_rate(global.wave);
+var _net = _rise - global.pump_capacity;
+
+draw_set_colour(c_white);
+draw_text(12, 90, "pumping " + string_format(global.pump_capacity, 1, 3) + "     tide " + string_format(_rise, 1, 3));
+
+draw_set_colour(_net > 0 ? c_red : c_lime);
+draw_text(12, 110, (_net > 0 ? "RISING  " : "RECEDING  ") + string_format(abs(_net), 1, 3) + "/s");
+draw_set_colour(c_white);

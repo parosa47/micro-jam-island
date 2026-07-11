@@ -16,6 +16,7 @@ if (keyboard_check_pressed(vk_space)) {
     var _c = instance_nearest(x, y, obj_cache);
     if (_c != noone && point_distance(x, y, _c.x, _c.y) < DIG_RANGE) {
         global.resource += CACHE_RESOURCE;
+		audio_play_sound(snd_dig, 4, false);
         with (_c) instance_destroy();
     }
 }
@@ -35,6 +36,7 @@ if (aa_timer <= 0) {
         aa_show = 6;
         var _mult = _e.is_boss ? AA_DMG_BOSS : AA_DMG_NORMAL;
         _e.hp -= _e.hp_max * _mult;
+		audio_play_sound(snd_hit, 4, false, 1, 0, random_range(0.9, 1.1));
 		_e.flash = 3;
     }
 }

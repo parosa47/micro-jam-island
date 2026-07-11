@@ -1,3 +1,6 @@
 hp = PUMP_HP;
-global.pump_capacity += PUMP_FLOW;
+level = 1;
+base_cost = PUMP_COST;
+flow = PUMP_FLOW;
+global.pump_capacity += flow;
 depth = 5;

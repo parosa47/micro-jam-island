@@ -20,6 +20,7 @@ if (target != noone && point_distance(x, y, target.x, target.y) < 20) {
 if (hp <= 0) {
     spawn_particles(x, y, COL_ENEMY, 8);
     add_shake(3);
+	audio_play_sound(snd_enemy_die, 6, false, 1, 0, random_range(0.92, 1.08));
     repeat (1 + floor(global.wave / 2)) instance_create_layer(x, y, "Instances", obj_pickup);
     instance_destroy();
 }

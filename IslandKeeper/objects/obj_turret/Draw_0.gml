@@ -6,3 +6,7 @@ var _ang = (_e != noone) ? point_direction(x, y, _e.x, _e.y) : 0;
 draw_set_colour(merge_colour(COL_WOOD, c_black, 0.35));
 draw_line_width(x, y, x + lengthdir_x(16, _ang), y + lengthdir_y(16, _ang), 5);
 draw_set_colour(c_white);
+
+for (var i = 0; i < level; i++) {
+   draw_level_pips(x, y + 17, dmg_lvl + range_lvl - 1);
+}
