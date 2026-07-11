@@ -5,3 +5,6 @@ target = noone;
 flash = 0;
 slow_t = 0;
 slow_mult = 1;
+path = path_add();
+path_version = -1;
+wp = 1;

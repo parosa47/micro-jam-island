@@ -30,7 +30,7 @@ function offensive_step() {
     if (global.state != GAME_STATE.PLAY) exit;
     if (is_frozen()) exit;
     var _ex = obj_game.island_r * (1 - global.water_level);
-    if (point_distance(obj_game.island_x, obj_game.island_y, x, y) > _ex) { instance_destroy(); exit; }
+    if (point_distance(obj_game.island_x, obj_game.island_y, x, y) > _ex) { global.nav_dirty = true; instance_destroy(); exit; }
     var _range = base_range + (range_lvl - 1) * 30;
     fire_cd -= 1;
     if (fire_cd <= 0) {
@@ -76,41 +76,53 @@ function upgrade_pump(_p) {
 
 function upg_stats(_b) {
     var _list = [];
+    var _cost = round(_b.base_cost * bld_level(_b) * UPGRADE_COST_MULT);
     switch (_b.kind) {
         case "pump":
-            array_push(_list, { id: "flow", label: "Flow", lvl: _b.level, cost: round(_b.base_cost * _b.level * UPGRADE_COST_MULT) });
+            array_push(_list, { id: "flow", label: "Flow", lvl: _b.level, cost: _cost });
             break;
         case "offensive":
-            array_push(_list, { id: "dmg",   label: "Damage",    lvl: _b.dmg_lvl,   cost: round(_b.base_cost * _b.dmg_lvl * UPGRADE_COST_MULT) });
-            array_push(_list, { id: "range", label: "Range",     lvl: _b.range_lvl, cost: round(_b.base_cost * _b.range_lvl * UPGRADE_COST_MULT) });
-            array_push(_list, { id: "rate",  label: "Fire rate", lvl: _b.rate_lvl,  cost: round(_b.base_cost * _b.rate_lvl * UPGRADE_COST_MULT) });
+            array_push(_list, { id: "dmg",   label: "Damage",    lvl: _b.dmg_lvl,   cost: _cost });
+            array_push(_list, { id: "range", label: "Range",     lvl: _b.range_lvl, cost: _cost });
+            array_push(_list, { id: "rate",  label: "Fire rate", lvl: _b.rate_lvl,  cost: _cost });
             break;
         case "aura":
-            array_push(_list, { id: "slow",  label: "Slow",  lvl: _b.slow_lvl,  cost: round(_b.base_cost * _b.slow_lvl * UPGRADE_COST_MULT) });
-            array_push(_list, { id: "range", label: "Range", lvl: _b.range_lvl, cost: round(_b.base_cost * _b.range_lvl * UPGRADE_COST_MULT) });
+            array_push(_list, { id: "slow",  label: "Slow",  lvl: _b.slow_lvl,  cost: _cost });
+            array_push(_list, { id: "range", label: "Range", lvl: _b.range_lvl, cost: _cost });
             break;
     }
     return _list;
 }
 
 function upg_apply(_b, _id) {
-    if (_id == "flow") { upgrade_pump(_b); return; }
-    var _lv = 1;
-    switch (_id) {
-        case "dmg":   _lv = _b.dmg_lvl;   break;
-        case "range": _lv = _b.range_lvl; break;
-        case "rate":  _lv = _b.rate_lvl;  break;
-        case "slow":  _lv = _b.slow_lvl;  break;
-    }
-    if (_lv >= BUILD_MAX_LEVEL) return;
-    var _cost = round(_b.base_cost * _lv * UPGRADE_COST_MULT);
+    if (bld_level(_b) >= BUILD_MAX_LEVEL) return;
+    var _cost = round(_b.base_cost * bld_level(_b) * UPGRADE_COST_MULT);
     if (global.resource < _cost) return;
     global.resource -= _cost;
     switch (_id) {
+        case "flow":
+            global.pump_capacity -= _b.flow;
+            _b.level += 1;
+            _b.flow = PUMP_FLOW * _b.level;
+            global.pump_capacity += _b.flow;
+            break;
         case "dmg":   _b.dmg_lvl += 1;   break;
         case "range": _b.range_lvl += 1; break;
         case "rate":  _b.rate_lvl += 1;  break;
         case "slow":  _b.slow_lvl += 1;  break;
     }
     add_shake(2);
+}
+
+function bld_level(_b) {
+    switch (_b.kind) {
+        case "pump":      return _b.level;
+        case "offensive": return _b.dmg_lvl + _b.range_lvl + _b.rate_lvl - 2;
+        case "aura":      return _b.slow_lvl + _b.range_lvl - 1;
+    }
+    return 1;
+}
+
+function grid_snap(_v) {
+    return floor(_v / CELL) * CELL + CELL * 0.5;
 }

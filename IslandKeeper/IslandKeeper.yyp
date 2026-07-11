@@ -32,6 +32,7 @@
   },
   "name":"IslandKeeper",
   "resources":[
+    {"id":{"name":"obj_building","path":"objects/obj_building/obj_building.yy",},},
     {"id":{"name":"obj_cache","path":"objects/obj_cache/obj_cache.yy",},},
     {"id":{"name":"obj_camera","path":"objects/obj_camera/obj_camera.yy",},},
     {"id":{"name":"obj_cannon","path":"objects/obj_cannon/obj_cannon.yy",},},

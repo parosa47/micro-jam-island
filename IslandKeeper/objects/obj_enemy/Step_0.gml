@@ -4,12 +4,35 @@ if (is_frozen()) exit;
 if (slow_t > 0) slow_t -= 1; else slow_mult = 1;
 var _spd = ENEMY_SPEED * slow_mult;
 
-if (!instance_exists(target)) target = instance_nearest(x, y, obj_pump);
-var _tx = (target != noone) ? target.x : obj_game.island_x;
-var _ty = (target != noone) ? target.y : obj_game.island_y;
+if (!instance_exists(target)) { target = instance_nearest(x, y, obj_pump); path_version = -1; }
+
+if (path_version != global.nav_version && target != noone) {
+    if (mp_grid_path(global.nav, path, x, y, target.x, target.y, true)) {
+        path_version = global.nav_version;
+        wp = 1;
+    } else {
+        path_version = -2;
+    }
+}
+
+var _tx, _ty;
+if (path_version >= 0 && path_get_number(path) >= 2) {
+    var _n = path_get_number(path);
+    _tx = path_get_point_x(path, wp);
+    _ty = path_get_point_y(path, wp);
+    if (point_distance(x, y, _tx, _ty) < 6 && wp < _n - 1) {
+        wp += 1;
+        _tx = path_get_point_x(path, wp);
+        _ty = path_get_point_y(path, wp);
+    }
+} else if (target != noone) {
+    _tx = target.x; _ty = target.y;
+} else {
+    _tx = obj_game.island_x; _ty = obj_game.island_y;
+}
 
 var _dist = point_distance(x, y, _tx, _ty);
-if (_dist > 4) {
+if (_dist > 2) {
     var _dir = point_direction(x, y, _tx, _ty);
     x += lengthdir_x(min(_spd, _dist), _dir);
     y += lengthdir_y(min(_spd, _dist), _dir);

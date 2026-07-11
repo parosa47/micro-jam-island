@@ -5,11 +5,9 @@ hover_bld = noone;
 if (global.build == BUILD.NONE) {
     if (keyboard_check_pressed(ord("B"))) global.build = BUILD.MENU;
 
-    var _bp = instance_nearest(mouse_x, mouse_y, obj_pump);
-    var _bt = instance_nearest(mouse_x, mouse_y, obj_turret);
-    var _bd = 22;
-    if (_bp != noone && point_distance(mouse_x, mouse_y, _bp.x, _bp.y) < _bd) { hover_bld = _bp; _bd = point_distance(mouse_x, mouse_y, _bp.x, _bp.y); }
-    if (_bt != noone && point_distance(mouse_x, mouse_y, _bt.x, _bt.y) < _bd) { hover_bld = _bt; }
+    var _b = instance_nearest(mouse_x, mouse_y, obj_building);
+    if (_b != noone && point_distance(mouse_x, mouse_y, _b.x, _b.y) < 22) hover_bld = _b;
+
     if (hover_bld != noone && mouse_check_button_pressed(mb_left)) {
         global.upg_bld = hover_bld;
         global.build = BUILD.UPGRADE;
@@ -59,20 +57,29 @@ if (global.build == BUILD.NONE) {
     }
     if (keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("B"))) global.build = BUILD.NONE;
 } else {
-    var _cx = mouse_x;
-    var _cy = mouse_y;
+    var _cx = grid_snap(mouse_x);
+    var _cy = grid_snap(mouse_y);
     var _ex = island_r * (1 - global.water_level);
-    var _np = instance_nearest(_cx, _cy, obj_pump);
-    var _nt = instance_nearest(_cx, _cy, obj_turret);
-    var _clear = ((_np == noone) || point_distance(_cx, _cy, _np.x, _np.y) > 28) && ((_nt == noone) || point_distance(_cx, _cy, _nt.x, _nt.y) > 28);
+    var _nb = instance_nearest(_cx, _cy, obj_building);
+    var _clear = (_nb == noone) || (point_distance(_cx, _cy, _nb.x, _nb.y) > CELL * 0.5);
     global.build_valid = (point_distance(island_x, island_y, _cx, _cy) < _ex - 14) && (global.resource >= global.build_cost) && _clear;
     if (mouse_check_button_pressed(mb_left) && global.build_valid) {
         global.resource -= global.build_cost;
         instance_create_layer(_cx, _cy, "Instances", global.build_obj);
+		global.nav_dirty = true;
         audio_play_sound(snd_place, 6, false);
         global.build = BUILD.NONE;
     }
     if (mouse_check_button_pressed(mb_right) || keyboard_check_pressed(vk_escape)) global.build = BUILD.NONE;
+}
+
+if (global.nav_dirty) {
+    mp_grid_clear_all(global.nav);
+    with (obj_building) {
+        if (kind == "offensive") mp_grid_add_cell(global.nav, floor(x / CELL), floor(y / CELL));
+    }
+    global.nav_version += 1;
+    global.nav_dirty = false;
 }
 
 if (is_frozen()) exit;
