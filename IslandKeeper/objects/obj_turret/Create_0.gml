@@ -1,6 +1,17 @@
 hp = TURRET_HP;
+kind = "offensive";
+base_dmg = TURRET_DMG;
+base_range = TURRET_RANGE;
+base_fire_cd = TURRET_FIRE_CD;
+aoe_radius = 0;
+proj_col = COL_GEM;
+proj_speed = 7;
 dmg_lvl = 1;
 range_lvl = 1;
+rate_lvl = 1;
 base_cost = TURRET_COST;
+barrel_len = 16;
+barrel_w = 5;
+dot_col = merge_colour(COL_WOOD, c_white, 0.5);
 fire_cd = 0;
 depth = 5;

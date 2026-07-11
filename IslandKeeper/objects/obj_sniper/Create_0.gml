@@ -1,0 +1,17 @@
+hp = TURRET_HP;
+kind = "offensive";
+base_dmg = SNIPER_DMG;
+base_range = SNIPER_RANGE;
+base_fire_cd = SNIPER_FIRE_CD;
+aoe_radius = 0;
+proj_col = make_colour_rgb(120, 220, 255);
+proj_speed = 12;
+dmg_lvl = 1;
+range_lvl = 1;
+rate_lvl = 1;
+base_cost = SNIPER_COST;
+barrel_len = 26;
+barrel_w = 3;
+dot_col = make_colour_rgb(120, 220, 255);
+fire_cd = 0;
+depth = 5;

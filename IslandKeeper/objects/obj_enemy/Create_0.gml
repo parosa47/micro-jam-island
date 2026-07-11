@@ -3,3 +3,5 @@ hp = hp_max;
 is_boss = false;
 target = noone;
 flash = 0;
+slow_t = 0;
+slow_mult = 1;

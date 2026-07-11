@@ -13,6 +13,7 @@ global.build = BUILD.NONE;
 global.build_obj = noone;
 global.build_cost = 0;
 global.build_valid = false;
+global.upg_bld = noone;
 
 island_x = room_width / 2;
 island_y = room_height / 2;
@@ -22,6 +23,14 @@ hover_bld = noone;
 enemy_timer = 0;
 wave_to_spawn = wave_enemy_count(global.wave);
 intermission_t = WAVE_PAUSE * GAME_FPS;
+
+global.build_defs = [
+    { obj: obj_pump,      name: "Pump",      cost: PUMP_COST },
+    { obj: obj_turret,    name: "Turret",    cost: TURRET_COST },
+    { obj: obj_sniper,    name: "Sniper",    cost: SNIPER_COST },
+    { obj: obj_cannon,    name: "Cannon",    cost: CANNON_COST },
+    { obj: obj_quicksand, name: "Quicksand", cost: QUICKSAND_COST }
+];
 
 repeat (CACHE_COUNT) {
     var _a = random(360);

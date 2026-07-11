@@ -3,53 +3,76 @@ var _grace = ceil(global.grace_t / GAME_FPS);
 draw_text(12, 10, "res " + string(global.resource) + "   wave " + string(global.wave) + "   water " + string_format(global.water_level, 1, 2) + "   grace " + string(_grace));
 
 if (global.build == BUILD.NONE) draw_text(12, 30, "ZQSD move   SPACE dig   B build   click a building = upgrade");
-if (global.build == BUILD.NONE) {
-    var _hp = instance_nearest(mouse_x, mouse_y, obj_pump);
-    var _ht = instance_nearest(mouse_x, mouse_y, obj_turret);
-    var _pk = noone; var _hd = 22;
-    if (_hp != noone && point_distance(mouse_x, mouse_y, _hp.x, _hp.y) < _hd) { _pk = _hp; _hd = point_distance(mouse_x, mouse_y, _hp.x, _hp.y); }
-    if (_ht != noone && point_distance(mouse_x, mouse_y, _ht.x, _ht.y) < _hd) { _pk = _ht; }
-    if (_pk != noone) {
-        var _lv = _pk.level;
-        var _s = (_lv < BUILD_MAX_LEVEL) ? ("lvl " + string(_lv) + "  -  upgrade: " + string(round(_pk.base_cost * _lv * UPGRADE_COST_MULT))) : ("lvl " + string(_lv) + "  -  MAX");
-        draw_text(12, 70, _s);
-    }
-}
 else if (global.build == BUILD.PLACING) draw_text(12, 30, "click  place      right-click  cancel");
-
 if (global.build == BUILD.MENU) {
     var _gw = display_get_gui_width();
     var _gh = display_get_gui_height();
     draw_set_alpha(0.6); draw_set_colour(c_black);
     draw_rectangle(0, 0, _gw, _gh, false);
     draw_set_alpha(1);
-
-    var _bw = 200; var _bh = 90; var _gap = 40;
+    var _n = array_length(global.build_defs);
+    var _bw = 140; var _bh = 90; var _gap = 12;
+    var _total = _n * _bw + (_n - 1) * _gap;
+    var _x0 = _gw / 2 - _total / 2;
     var _by = _gh / 2 - _bh / 2;
-    var _bx1 = _gw / 2 - _bw - _gap / 2;
-    var _bx2 = _gw / 2 + _gap / 2;
     var _mgx = device_mouse_x_to_gui(0);
     var _mgy = device_mouse_y_to_gui(0);
-
     draw_set_halign(fa_center);
     draw_set_valign(fa_middle);
     draw_set_colour(c_white);
     draw_text(_gw / 2, _by - 34, "BUILD - time paused   (ESC to cancel)");
+    for (var i = 0; i < _n; i++) {
+        var _bx = _x0 + i * (_bw + _gap);
+        var _def = global.build_defs[i];
+        var _over = (_mgx > _bx && _mgx < _bx + _bw && _mgy > _by && _mgy < _by + _bh);
+        var _afford = (global.resource >= _def.cost);
+        var _base = (_def.obj == obj_pump) ? COL_METAL : COL_WOOD;
+        draw_set_colour(_over ? merge_colour(_base, c_white, 0.25) : merge_colour(_base, c_black, 0.35));
+        draw_rectangle(_bx, _by, _bx + _bw, _by + _bh, false);
+        draw_set_colour(_afford ? c_white : make_colour_rgb(210, 120, 120));
+        draw_text(_bx + _bw / 2, _by + _bh / 2 - 10, _def.name);
+        draw_text(_bx + _bw / 2, _by + _bh / 2 + 12, string(_def.cost) + " res");
+    }
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}
+if (global.build == BUILD.UPGRADE && instance_exists(global.upg_bld)) {
+    var _gw = display_get_gui_width();
+    var _gh = display_get_gui_height();
+    draw_set_alpha(0.6); draw_set_colour(c_black);
+    draw_rectangle(0, 0, _gw, _gh, false);
+    draw_set_alpha(1);
 
-    var _over1 = (_mgx > _bx1 && _mgx < _bx1 + _bw && _mgy > _by && _mgy < _by + _bh);
-    draw_set_colour(_over1 ? COL_METAL : merge_colour(COL_METAL, c_black, 0.4));
-    draw_rectangle(_bx1, _by, _bx1 + _bw, _by + _bh, false);
+    var _stats = upg_stats(global.upg_bld);
+    var _n = array_length(_stats);
+    var _rw = 320; var _rh = 34; var _sp = 8;
+    var _px = _gw / 2 - _rw / 2;
+    var _py = _gh / 2 - (_n * (_rh + _sp)) / 2;
+    var _mgx = device_mouse_x_to_gui(0);
+    var _mgy = device_mouse_y_to_gui(0);
+
     draw_set_colour(c_white);
-    draw_text(_bx1 + _bw / 2, _by + _bh / 2 - 10, "Pump");
-    draw_text(_bx1 + _bw / 2, _by + _bh / 2 + 12, string(PUMP_COST) + " res");
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+    draw_text(_gw / 2, _py - 26, ((global.upg_bld.object_index == obj_pump) ? "PUMP" : "TURRET") + " upgrade  -  time paused");
 
-    var _over2 = (_mgx > _bx2 && _mgx < _bx2 + _bw && _mgy > _by && _mgy < _by + _bh);
-    draw_set_colour(_over2 ? COL_WOOD : merge_colour(COL_WOOD, c_black, 0.4));
-    draw_rectangle(_bx2, _by, _bx2 + _bw, _by + _bh, false);
+    for (var i = 0; i < _n; i++) {
+        var _ry = _py + i * (_rh + _sp);
+        var _over = (_mgx > _px && _mgx < _px + _rw && _mgy > _ry && _mgy < _ry + _rh);
+        var _maxed = (_stats[i].lvl >= BUILD_MAX_LEVEL);
+        var _afford = (global.resource >= _stats[i].cost);
+        draw_set_colour(_maxed ? make_colour_rgb(55, 55, 60) : (_over ? merge_colour(COL_WOOD, c_white, 0.25) : merge_colour(COL_WOOD, c_black, 0.35)));
+        draw_rectangle(_px, _ry, _px + _rw, _ry + _rh, false);
+        draw_set_colour((_afford || _maxed) ? c_white : make_colour_rgb(210, 120, 120));
+        draw_set_halign(fa_left);
+        draw_text(_px + 14, _ry + _rh / 2, _stats[i].label + "   lvl " + string(_stats[i].lvl));
+        draw_set_halign(fa_right);
+        draw_text(_px + _rw - 14, _ry + _rh / 2, _maxed ? "MAX" : string(_stats[i].cost));
+    }
+
     draw_set_colour(c_white);
-    draw_text(_bx2 + _bw / 2, _by + _bh / 2 - 10, "Turret");
-    draw_text(_bx2 + _bw / 2, _by + _bh / 2 + 12, string(TURRET_COST) + " res");
-
+    draw_set_halign(fa_center);
+    draw_text(_gw / 2, _py + _n * (_rh + _sp) + 18, "click a stat to upgrade  -  ESC / click outside to close");
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
 }

@@ -1,4 +1,4 @@
-if (global.build == BUILD.MENU) exit;
+if (is_frozen()) exit;
 x += lengthdir_x(spd, dir);
 y += lengthdir_y(spd, dir);
 spd *= 0.9;

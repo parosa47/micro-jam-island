@@ -1,5 +1,5 @@
 if (global.state != GAME_STATE.PLAY) exit;
-if (global.build == BUILD.MENU) exit;
+if (is_frozen()) exit;
 
 var _mx = keyboard_check(ord("D")) - keyboard_check(ord("Q"));
 var _my = keyboard_check(ord("S")) - keyboard_check(ord("Z"));

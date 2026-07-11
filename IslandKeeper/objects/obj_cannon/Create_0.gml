@@ -1,0 +1,17 @@
+hp = TURRET_HP;
+kind = "offensive";
+base_dmg = CANNON_DMG;
+base_range = CANNON_RANGE;
+base_fire_cd = CANNON_FIRE_CD;
+aoe_radius = CANNON_AOE;
+proj_col = COL_ALERT;
+proj_speed = 6;
+dmg_lvl = 1;
+range_lvl = 1;
+rate_lvl = 1;
+base_cost = CANNON_COST;
+barrel_len = 13;
+barrel_w = 9;
+dot_col = COL_ALERT;
+fire_cd = 0;
+depth = 5;
