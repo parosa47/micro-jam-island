@@ -9,13 +9,13 @@
 
 #macro PUMP_HP 60
 #macro PUMP_COST 15
-#macro PUMP_FLOW 0.008
+#macro PUMP_FLOW 0.02
 
 #macro TURRET_HP 45
 #macro TURRET_COST 20
 #macro TURRET_RANGE 250
 #macro TURRET_FIRE_CD 25
-#macro TURRET_DMG 8
+#macro TURRET_DMG 0.1
 #macro BUILD_MAX_LEVEL 8
 #macro UPGRADE_COST_MULT 0.75
 
@@ -47,15 +47,18 @@
 #macro CANNON_FIRE_CD 70
 #macro CANNON_AOE 55
 
-#macro QUICKSAND_COST 25
+#macro QUICKSAND_COST 10
 #macro QUICKSAND_RANGE 90
 #macro QUICKSAND_SLOW 0.55
 
 #macro CELL 32
 
+#macro WALL_COST 10
+#macro WALL_PREMIUM 2
+
 enum GAME_STATE { TITLE, PLAY, OVER }
 enum BUILD_CAT { PRODUCTION, OFFENSE }
-enum BUILD { NONE, MENU, PLACING, UPGRADE }
+enum BUILD { NONE, MENU, PLACING, UPGRADE, CONVERT }
 
 function wave_rise_rate(_w) {
 	return WATER_BASE_RISE * power(1 + WATER_RISE_GROWTH, _w - 1);

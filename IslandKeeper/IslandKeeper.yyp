@@ -46,6 +46,7 @@
     {"id":{"name":"obj_quicksand","path":"objects/obj_quicksand/obj_quicksand.yy",},},
     {"id":{"name":"obj_sniper","path":"objects/obj_sniper/obj_sniper.yy",},},
     {"id":{"name":"obj_turret","path":"objects/obj_turret/obj_turret.yy",},},
+    {"id":{"name":"obj_wall","path":"objects/obj_wall/obj_wall.yy",},},
     {"id":{"name":"rm_game","path":"rooms/rm_game/rm_game.yy",},},
     {"id":{"name":"scr_balance","path":"scripts/scr_balance/scr_balance.yy",},},
     {"id":{"name":"scr_building","path":"scripts/scr_building/scr_building.yy",},},

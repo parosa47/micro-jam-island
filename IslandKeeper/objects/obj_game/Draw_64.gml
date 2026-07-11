@@ -76,6 +76,36 @@ if (global.build == BUILD.UPGRADE && instance_exists(global.upg_bld)) {
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
 }
+if (global.build == BUILD.CONVERT && instance_exists(global.upg_bld)) {
+    var _gw = display_get_gui_width();
+    var _gh = display_get_gui_height();
+    draw_set_alpha(0.6); draw_set_colour(c_black);
+    draw_rectangle(0, 0, _gw, _gh, false);
+    draw_set_alpha(1);
+    var _opts = convert_options();
+    var _no = array_length(_opts);
+    var _bw = 140; var _bh = 90; var _gap = 12;
+    var _x0 = _gw / 2 - (_no * _bw + (_no - 1) * _gap) / 2;
+    var _by = _gh / 2 - _bh / 2;
+    var _mgx = device_mouse_x_to_gui(0);
+    var _mgy = device_mouse_y_to_gui(0);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+    draw_set_colour(c_white);
+    draw_text(_gw / 2, _by - 34, "CONVERT WALL - time paused   (ESC to cancel)");
+    for (var i = 0; i < _no; i++) {
+        var _bx = _x0 + i * (_bw + _gap);
+        var _over = (_mgx > _bx && _mgx < _bx + _bw && _mgy > _by && _mgy < _by + _bh);
+        var _afford = (global.resource >= _opts[i].cost);
+        draw_set_colour(_over ? merge_colour(COL_WOOD, c_white, 0.25) : merge_colour(COL_WOOD, c_black, 0.35));
+        draw_rectangle(_bx, _by, _bx + _bw, _by + _bh, false);
+        draw_set_colour(_afford ? c_white : make_colour_rgb(210, 120, 120));
+        draw_text(_bx + _bw / 2, _by + _bh / 2 - 10, _opts[i].name);
+        draw_text(_bx + _bw / 2, _by + _bh / 2 + 12, string(_opts[i].cost) + " res");
+    }
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}
 
 if (global.state == GAME_STATE.OVER) {
     draw_set_halign(fa_center); draw_set_valign(fa_middle);

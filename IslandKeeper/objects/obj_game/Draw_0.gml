@@ -36,7 +36,7 @@ if (global.build == BUILD.PLACING) {
 }
 
 if (global.state == GAME_STATE.PLAY && global.build == BUILD.NONE && instance_exists(hover_bld)) {
-    if (hover_bld.kind == "offensive" || hover_bld.kind == "aura") {
+    if (hover_bld.kind == "offensive") {
         var _r = hover_bld.base_range + (hover_bld.range_lvl - 1) * 30;
         draw_set_colour(c_white);
         draw_set_alpha(0.10); draw_circle(hover_bld.x, hover_bld.y, _r, false);

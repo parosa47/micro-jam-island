@@ -30,6 +30,7 @@ intermission_t = WAVE_PAUSE * GAME_FPS;
 
 global.build_defs = [
     { obj: obj_pump,      name: "Pump",      cost: PUMP_COST },
+	{ obj: obj_wall,      name: "Wall",      cost: WALL_COST },
     { obj: obj_turret,    name: "Turret",    cost: TURRET_COST },
     { obj: obj_sniper,    name: "Sniper",    cost: SNIPER_COST },
     { obj: obj_cannon,    name: "Cannon",    cost: CANNON_COST },

@@ -1,5 +1,5 @@
 function is_frozen() {
-    return (global.build == BUILD.MENU || global.build == BUILD.UPGRADE);
+    return (global.build == BUILD.MENU || global.build == BUILD.UPGRADE || global.build == BUILD.CONVERT);
 }
 
 function tier_colour(_lv) {
@@ -22,7 +22,6 @@ function type_base_range(_obj) {
     if (_obj == obj_turret)    return TURRET_RANGE;
     if (_obj == obj_sniper)    return SNIPER_RANGE;
     if (_obj == obj_cannon)    return CANNON_RANGE;
-    if (_obj == obj_quicksand) return QUICKSAND_RANGE;
     return 0;
 }
 
@@ -49,7 +48,7 @@ function offensive_step() {
 }
 
 function offensive_draw() {
-    var _s = 12;
+    var _s = CELL * 0.5 - 1;;
     var _tl = merge_colour(COL_WOOD, c_white, 0.20);
     draw_rectangle_colour(x - _s, y - _s, x + _s, y + _s, _tl, _tl, COL_WOOD, COL_WOOD, false);
     var _e = instance_nearest(x, y, obj_enemy);
@@ -87,9 +86,8 @@ function upg_stats(_b) {
             array_push(_list, { id: "rate",  label: "Fire rate", lvl: _b.rate_lvl,  cost: _cost });
             break;
         case "aura":
-            array_push(_list, { id: "slow",  label: "Slow",  lvl: _b.slow_lvl,  cost: _cost });
-            array_push(_list, { id: "range", label: "Range", lvl: _b.range_lvl, cost: _cost });
-            break;
+		    array_push(_list, { id: "slow", label: "Slow", lvl: _b.slow_lvl, cost: _cost });
+		    break;
     }
     return _list;
 }
@@ -118,7 +116,7 @@ function bld_level(_b) {
     switch (_b.kind) {
         case "pump":      return _b.level;
         case "offensive": return _b.dmg_lvl + _b.range_lvl + _b.rate_lvl - 2;
-        case "aura":      return _b.slow_lvl + _b.range_lvl - 1;
+        case "aura": return _b.slow_lvl;
     }
     return 1;
 }
@@ -128,5 +126,17 @@ function grid_snap(_v) {
 }
 
 function is_solid_type(_obj) {
-    return (_obj == obj_turret || _obj == obj_sniper || _obj == obj_cannon);
+    return (_obj == obj_turret || _obj == obj_sniper || _obj == obj_cannon || _obj == obj_wall);
+}
+
+function convert_options() {
+    var _opts = [];
+    var _nd = array_length(global.build_defs);
+    for (var i = 0; i < _nd; i++) {
+        var _o = global.build_defs[i].obj;
+        if (is_solid_type(_o) && _o != obj_wall) {
+            array_push(_opts, { obj: _o, name: global.build_defs[i].name, cost: max(1, global.build_defs[i].cost - WALL_COST + WALL_PREMIUM) });
+        }
+    }
+    return _opts;
 }

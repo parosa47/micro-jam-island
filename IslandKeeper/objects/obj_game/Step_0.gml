@@ -10,7 +10,7 @@ if (global.build == BUILD.NONE) {
 
     if (hover_bld != noone && mouse_check_button_pressed(mb_left)) {
         global.upg_bld = hover_bld;
-        global.build = BUILD.UPGRADE;
+        global.build = (hover_bld.kind == "wall") ? BUILD.CONVERT : BUILD.UPGRADE;
     }
 } else if (global.build == BUILD.UPGRADE) {
     if (!instance_exists(global.upg_bld) || keyboard_check_pressed(vk_escape)) {
@@ -31,6 +31,37 @@ if (global.build == BUILD.NONE) {
             if (_mgx > _px && _mgx < _px + _rw && _mgy > _ry && _mgy < _ry + _rh) {
                 upg_apply(global.upg_bld, _stats[i].id);
                 _hit = true;
+            }
+        }
+        if (!_hit) global.build = BUILD.NONE;
+    }
+} else if (global.build == BUILD.CONVERT) {
+    if (!instance_exists(global.upg_bld) || keyboard_check_pressed(vk_escape)) {
+        global.build = BUILD.NONE;
+    } else if (mouse_check_button_pressed(mb_left)) {
+        var _gw = display_get_gui_width();
+        var _gh = display_get_gui_height();
+        var _opts = convert_options();
+        var _no = array_length(_opts);
+        var _bw = 140; var _bh = 90; var _gap = 12;
+        var _x0 = _gw / 2 - (_no * _bw + (_no - 1) * _gap) / 2;
+        var _by = _gh / 2 - _bh / 2;
+        var _mgx = device_mouse_x_to_gui(0);
+        var _mgy = device_mouse_y_to_gui(0);
+        var _hit = false;
+        for (var i = 0; i < _no; i++) {
+            var _bx = _x0 + i * (_bw + _gap);
+            if (_mgx > _bx && _mgx < _bx + _bw && _mgy > _by && _mgy < _by + _bh) {
+                _hit = true;
+                if (global.resource >= _opts[i].cost) {
+                    var _wx = global.upg_bld.x;
+                    var _wy = global.upg_bld.y;
+                    with (global.upg_bld) instance_destroy();
+                    instance_create_layer(_wx, _wy, "Instances", _opts[i].obj);
+                    global.resource -= _opts[i].cost;
+                    global.nav_dirty = true;
+                    global.build = BUILD.NONE;
+                }
             }
         }
         if (!_hit) global.build = BUILD.NONE;
@@ -90,7 +121,7 @@ if (global.build == BUILD.NONE) {
 if (global.nav_dirty) {
     mp_grid_clear_all(global.nav);
     with (obj_building) {
-        if (kind == "offensive") mp_grid_add_cell(global.nav, floor(x / CELL), floor(y / CELL));
+        if (kind == "offensive" || kind == "wall") mp_grid_add_cell(global.nav, floor(x / CELL), floor(y / CELL));
     }
     global.nav_version += 1;
     global.nav_dirty = false;
