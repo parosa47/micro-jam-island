@@ -85,5 +85,8 @@ for (var _i = 0; _i < 7; _i++) {
 }
 
 if (!variable_global_exists("volume")) global.volume = 1;
+if (!variable_global_exists("tut_on")) global.tut_on = true;
 if (!variable_global_exists("sfx_on")) global.sfx_on = true;
 audio_master_gain(global.volume);
+global.tut = 0;
+if (!variable_global_exists("tut_seen")) global.tut_seen = false;

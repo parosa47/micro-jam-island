@@ -26,11 +26,16 @@ if (global.state == GAME_STATE.TITLE) {
             var _b = _btns[i];
             if (_mgx > _b.x && _mgx < _b.x + _b.w && _mgy > _b.y && _mgy < _b.y + _b.h) {
                 switch (_b.id) {
-                    case "start":   global.state = GAME_STATE.PLAY; intro_dialogue(); audio_stop_sound(snd_menu); global.menu_music_on = false; break;
+                    case "start":
+                        global.state = GAME_STATE.PLAY;
+                        audio_stop_sound(snd_menu); global.menu_music_on = false;
+                        if (global.tut_on) global.tut = 1; else intro_dialogue();
+                        break;
                     case "howto":   menu_page = MENU.HOWTO; break;
                     case "options": menu_page = MENU.OPTIONS; break;
                     case "back":    menu_page = MENU.MAIN; break;
 		            case "volume":  break;
+                    case "tut":     global.tut_on = !global.tut_on; break;
                     default:        rebind_slot = _b.id; break;
                 }
             }
@@ -80,6 +85,13 @@ if (global.paused) {
             audio_stop_all();
             room_restart();
         }
+    }
+    exit;
+}
+if (global.tut > 0) {
+    if (mouse_check_button_pressed(mb_left) || keyboard_check_pressed(vk_space)) {
+        global.tut += 1;
+        if (global.tut > TUT_CARDS) { global.tut = 0; intro_dialogue(); }
     }
     exit;
 }

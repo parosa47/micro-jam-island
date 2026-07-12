@@ -1,5 +1,5 @@
 function is_frozen() {
-    return (global.build == BUILD.MENU || global.build == BUILD.UPGRADE || global.build == BUILD.CONVERT || global.paused);
+    return (global.build == BUILD.MENU || global.build == BUILD.UPGRADE || global.build == BUILD.CONVERT || global.paused || global.tut > 0);
 }
 
 function tier_colour(_lv) {
@@ -161,7 +161,7 @@ function convert_options() {
     for (var i = 0; i < _nd; i++) {
         var _o = global.build_defs[i].obj;
         if (is_solid_type(_o) && _o != obj_wall) {
-            array_push(_opts, { obj: _o, name: global.build_defs[i].name, cost: max(1, global.build_defs[i].cost - WALL_COST + WALL_PREMIUM) });
+             array_push(_opts, { obj: _o, name: global.build_defs[i].name, cost: max(1, global.build_defs[i].cost - WALL_COST) });
         }
     }
     return _opts;

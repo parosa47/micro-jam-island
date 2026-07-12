@@ -3,7 +3,26 @@ draw_set_colour(c_white);
 var _grace = ceil(global.grace_t / GAME_FPS);
 var _rise = wave_rise_rate(global.wave);
 var _net = _rise - global.pump_capacity;
-
+if (global.tut > 0) {
+    var _gw = display_get_gui_width(), _gh = display_get_gui_height();
+    draw_set_alpha(0.7); draw_set_colour(c_black);
+    draw_rectangle(0, 0, _gw, _gh, false);
+    draw_set_alpha(1);
+    var _pw = 580, _ph = 210, _px = _gw / 2 - _pw / 2, _py = _gh / 2 - _ph / 2;
+    draw_set_colour(merge_colour(COL_SEA_DEEP, c_black, 0.35));
+    draw_rectangle(_px, _py, _px + _pw, _py + _ph, false);
+    draw_set_colour(COL_SAND);
+    draw_rectangle(_px, _py, _px + _pw, _py + _ph, true);
+    draw_set_font(fnt_ui);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+    draw_set_colour(c_white);
+    draw_text(_gw / 2, _gh / 2 - 12, tut_text(global.tut));
+    draw_set_colour(COL_FOAM);
+    draw_text(_gw / 2, _py + _ph - 22, "click or SPACE to continue   (" + string(global.tut) + " / " + string(TUT_CARDS) + ")");
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}
 if (global.grace_t > 0) {
     draw_label(14, 12, "Wave 1 in " + string(ceil(global.grace_t / GAME_FPS)) + "s   -   Salvage " + string(global.resource), fa_left);
 } else {
@@ -289,6 +308,7 @@ if (global.state == GAME_STATE.TITLE) {
                 if (_b.id == "down")  _lbl = "Move Down  -  "  + (rebind_slot == "down"  ? "< press a key >" : key_name(global.key_down));
                 if (_b.id == "left")  _lbl = "Move Left  -  "  + (rebind_slot == "left"  ? "< press a key >" : key_name(global.key_left));
                 if (_b.id == "right") _lbl = "Move Right  -  " + (rebind_slot == "right" ? "< press a key >" : key_name(global.key_right));
+                if (_b.id == "tut") _lbl = "Tutorial:  " + (global.tut_on ? "ON" : "OFF");
                 draw_menu_button(_b, _lbl);
             }
         }
