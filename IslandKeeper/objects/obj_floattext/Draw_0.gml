@@ -1,0 +1,13 @@
+draw_set_font(fnt_ui);
+draw_set_halign(fa_center);
+draw_set_valign(fa_middle);
+var _a = clamp(life / maxlife, 0, 1);
+draw_set_alpha(_a);
+draw_set_colour(c_black);
+draw_text(x + 1, y + 1, txt);
+draw_set_colour(col);
+draw_text(x, y, txt);
+draw_set_alpha(1);
+draw_set_colour(c_white);
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);

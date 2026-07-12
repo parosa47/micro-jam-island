@@ -1,6 +1,7 @@
 game_set_speed(GAME_FPS, gamespeed_fps);
 draw_set_circle_precision(64);
 depth = 1000;
+plane_wave = 0;
 
 global.state = GAME_STATE.TITLE;
 global.water_level = 0;
@@ -18,6 +19,19 @@ global.nav = mp_grid_create(0, 0, ceil(room_width / CELL), ceil(room_height / CE
 global.nav_dirty = true;
 global.nav_version = 0;
 global.testpath = path_add();
+global.msg_queue = [];
+global.msg_t = 0;
+global.msg_chars = 0;
+global.msg_voiced = false;
+global.radio_voice = -1;
+global.shot_snd_t = 0;
+global.first_cargo = true;
+global.selling = false;
+global.lose_reason = "The island drowned";
+global.menu_music_on = false;
+global.paused = false;
+if (!variable_global_exists("audio_ready")) global.audio_ready = false;
+if (os_browser == browser_not_a_browser) global.audio_ready = true;
 
 
 island_x = room_width / 2;
@@ -46,8 +60,30 @@ global.enemy_defs = [
 ];
 boss_pending = false;
 
-repeat (CACHE_COUNT) {
-    var _a = random(360);
-    var _d = random_range(60, island_r - 60);
-    instance_create_layer(island_x + lengthdir_x(_d, _a), island_y + lengthdir_y(_d, _a), "Instances", obj_cache);
+menu_page = MENU.MAIN;
+rebind_slot = "";
+if (!variable_global_exists("key_up")) {
+    global.key_up = ord("Z");
+    global.key_down = ord("S");
+    global.key_left = ord("Q");
+    global.key_right = ord("D");
 }
+
+island_n = 64;
+island_coast = array_create(island_n);
+island_veg = array_create(island_n);
+var _p1 = random(360), _p2 = random(360), _p3 = random(360);
+var _q1 = random(360), _q2 = random(360);
+for (var _i = 0; _i < island_n; _i++) {
+    var _ia = _i / island_n * 360;
+    island_coast[_i] = 1 + 0.05 * dsin(_ia * 3 + _p1) + 0.035 * dsin(_ia * 5 + _p2) + 0.02 * dsin(_ia * 7 + _p3);
+    island_veg[_i]   = 1 + 0.12 * dsin(_ia * 2 + _q1) + 0.07 * dsin(_ia * 4 + _q2);
+}
+island_deco = array_create(7);
+for (var _i = 0; _i < 7; _i++) {
+    island_deco[_i] = { a: random(360), dist: random_range(0.12, 0.46) * island_r, s: random_range(16, 30), palm: (_i < 3) };
+}
+
+if (!variable_global_exists("volume")) global.volume = 1;
+if (!variable_global_exists("sfx_on")) global.sfx_on = true;
+audio_master_gain(global.volume);

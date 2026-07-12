@@ -3,14 +3,41 @@ draw_rectangle(0, 0, room_width, room_height, false);
 
 var _exposed = island_r * (1 - global.water_level);
 
-draw_set_colour(COL_WATER);
-draw_circle(island_x, island_y, _exposed + 26, false);
-draw_set_colour(COL_FOAM);
-draw_circle(island_x, island_y, _exposed + 12, false);
-draw_set_colour(COL_SAND_WET);
-draw_circle(island_x, island_y, _exposed + 5, false);
-draw_set_colour(COL_SAND);
-draw_circle(island_x, island_y, _exposed, false);
+draw_blob(island_x, island_y, island_r, island_coast, island_n, COL_SAND);
+draw_blob(island_x, island_y, island_r * 0.58, island_coast, island_n, COL_VEG_LIGHT, _exposed, island_coast);
+
+for (var _i = 0; _i < array_length(island_deco); _i++) {
+    var _dc = island_deco[_i];
+    if (_dc.palm) continue;
+    var _fade = clamp((_exposed - _dc.dist) / 20, 0, 1);
+    if (_fade <= 0) continue;
+    var _dx = island_x + lengthdir_x(_dc.dist, _dc.a);
+    var _dy = island_y + lengthdir_y(_dc.dist, _dc.a);
+    draw_set_alpha(_fade);
+    draw_set_colour(COL_VEG_DARK);
+    draw_circle(_dx, _dy, _dc.s * 0.5, false);
+    draw_set_alpha(1);
+}
+for (var _i = 0; _i < array_length(island_deco); _i++) {
+    var _dc = island_deco[_i];
+    if (!_dc.palm) continue;
+    var _fade = clamp((_exposed - _dc.dist) / 20, 0, 1);
+    if (_fade <= 0) continue;
+    var _dx = island_x + lengthdir_x(_dc.dist, _dc.a);
+    var _dy = island_y + lengthdir_y(_dc.dist, _dc.a);
+    draw_set_alpha(_fade);
+    draw_palm(_dx, _dy, _dc.s);
+    draw_set_alpha(1);
+}
+var _shore = _exposed;
+if (_exposed > island_r * 0.58) {
+    draw_ring(island_x, island_y, _exposed, _exposed + 14, island_coast, island_n, COL_SAND_WET);
+    _shore = _exposed + 14;
+}
+draw_ring(island_x, island_y, _shore,        _exposed + 24,  island_coast, island_n, COL_FOAM);
+draw_ring(island_x, island_y, _exposed + 24, _exposed + 44,  island_coast, island_n, COL_WATER);
+draw_ring(island_x, island_y, _exposed + 44, _exposed + 66,  island_coast, island_n, merge_colour(COL_SEA_DEEP, COL_WATER, 0.55));
+draw_ring(island_x, island_y, _exposed + 66, island_r * 1.6, island_coast, island_n, COL_SEA_DEEP);
 draw_set_colour(c_white);
 
 if (global.build == BUILD.PLACING) {
@@ -44,7 +71,9 @@ if (global.state == GAME_STATE.PLAY && global.build == BUILD.NONE && instance_ex
         draw_set_alpha(1);
     }
     draw_set_halign(fa_center);
+    draw_set_valign(fa_bottom);
     draw_set_colour(c_white);
-    draw_text(hover_bld.x, hover_bld.y - 22, "click to upgrade");
+    draw_text(hover_bld.x, hover_bld.y - 20, "L-click: upgrade    R-click: sell");
     draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
 }

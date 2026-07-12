@@ -8,6 +8,7 @@ function spawn_enemy(_x, _y, _idx) {
     _e.col     = _def.col;
     _e.is_boss = _def.boss;
     _e.drop    = _def.drop;
+	_e.kind = _idx;
     return _e;
 }
 

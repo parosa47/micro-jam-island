@@ -1,5 +1,5 @@
 function is_frozen() {
-    return (global.build == BUILD.MENU || global.build == BUILD.UPGRADE || global.build == BUILD.CONVERT);
+    return (global.build == BUILD.MENU || global.build == BUILD.UPGRADE || global.build == BUILD.CONVERT || global.paused);
 }
 
 function tier_colour(_lv) {
@@ -38,11 +38,14 @@ function offensive_step() {
             fire_cd = max(6, base_fire_cd - (rate_lvl - 1) * 4);
             var _b = instance_create_layer(x, y, "Instances", obj_projectile);
             _b.target = _e;
-            _b.dmg = base_dmg * dmg_lvl;
+            _b.dmg = off_damage(base_dmg, dmg_lvl);
             _b.aoe = aoe_radius;
             _b.col = proj_col;
             _b.spd = proj_speed;
-            audio_play_sound(snd_shoot, 5, false, 1, 0, random_range(0.9, 1.1));
+			if (global.sfx_on && global.shot_snd_t <= 0) {
+                audio_play_sound(snd_shoot, 5, false, 0.7, 0, random_range(0.9, 1.1));
+                global.shot_snd_t = SHOT_SND_GAP;
+            }
         }
     }
 }
@@ -61,6 +64,14 @@ function offensive_draw() {
     draw_level_pips(x, y + 17, dmg_lvl + range_lvl + rate_lvl - 2);
 }
 
+function pump_flow(_level) {
+    return PUMP_FLOW * _level;
+}
+
+function off_damage(_base, _lvl) {
+    return _base * power(1 + OFF_DMG_GROWTH, _lvl - 1);
+}
+
 function upgrade_pump(_p) {
     if (_p.level >= BUILD_MAX_LEVEL) return;
     var _cost = round(_p.base_cost * _p.level * UPGRADE_COST_MULT);
@@ -68,7 +79,7 @@ function upgrade_pump(_p) {
     global.resource -= _cost;
     global.pump_capacity -= _p.flow;
     _p.level += 1;
-    _p.flow = PUMP_FLOW * _p.level;
+    _p.flow = pump_flow(_p.level);
     global.pump_capacity += _p.flow;
     add_shake(2);
 }
@@ -78,16 +89,30 @@ function upg_stats(_b) {
     var _cost = round(_b.base_cost * bld_level(_b) * UPGRADE_COST_MULT);
     switch (_b.kind) {
         case "pump":
-            array_push(_list, { id: "flow", label: "Flow", lvl: _b.level, cost: _cost });
+            array_push(_list, { id: "flow", label: "Flow",
+                cur: string_format(_b.flow, 1, 3),
+                nxt: string_format(pump_flow(_b.level + 1), 1, 3), cost: _cost });
             break;
         case "offensive":
-            array_push(_list, { id: "dmg",   label: "Damage",    lvl: _b.dmg_lvl,   cost: _cost });
-            array_push(_list, { id: "range", label: "Range",     lvl: _b.range_lvl, cost: _cost });
-            array_push(_list, { id: "rate",  label: "Fire rate", lvl: _b.rate_lvl,  cost: _cost });
+            array_push(_list, { id: "dmg", label: "Damage",
+                cur: string(round(off_damage(_b.base_dmg, _b.dmg_lvl))),
+                nxt: string(round(off_damage(_b.base_dmg, _b.dmg_lvl + 1))), cost: _cost });
+            array_push(_list, { id: "range", label: "Range",
+                cur: string(_b.base_range + (_b.range_lvl - 1) * 30),
+                nxt: string(_b.base_range + _b.range_lvl * 30), cost: _cost });
+            var _cd0 = max(6, _b.base_fire_cd - (_b.rate_lvl - 1) * 4);
+            var _cd1 = max(6, _b.base_fire_cd - _b.rate_lvl * 4);
+            array_push(_list, { id: "rate", label: "Fire rate",
+                cur: string_format(GAME_FPS / _cd0, 1, 1) + "/s",
+                nxt: string_format(GAME_FPS / _cd1, 1, 1) + "/s", cost: _cost });
             break;
         case "aura":
-		    array_push(_list, { id: "slow", label: "Slow", lvl: _b.slow_lvl, cost: _cost });
-		    break;
+            var _s0 = max(0.60, QUICKSAND_SLOW - (_b.slow_lvl - 1) * 0.025);
+            var _s1 = max(0.60, QUICKSAND_SLOW - _b.slow_lvl * 0.025);
+            array_push(_list, { id: "slow", label: "Slow",
+                cur: string(round((1 - _s0) * 100)) + "%",
+                nxt: string(round((1 - _s1) * 100)) + "%", cost: _cost });
+            break;
     }
     return _list;
 }
@@ -97,11 +122,12 @@ function upg_apply(_b, _id) {
     var _cost = round(_b.base_cost * bld_level(_b) * UPGRADE_COST_MULT);
     if (global.resource < _cost) return;
     global.resource -= _cost;
+	_b.invested += _cost;
     switch (_id) {
         case "flow":
             global.pump_capacity -= _b.flow;
             _b.level += 1;
-            _b.flow = PUMP_FLOW * _b.level;
+            _b.flow = pump_flow(_b.level);
             global.pump_capacity += _b.flow;
             break;
         case "dmg":   _b.dmg_lvl += 1;   break;
@@ -139,4 +165,27 @@ function convert_options() {
         }
     }
     return _opts;
+}
+
+function type_stats(_obj) {
+    if (_obj == obj_pump)      return "Flow " + string_format(PUMP_FLOW, 1, 3);
+    if (_obj == obj_turret)    return "Dmg " + string(TURRET_DMG) + "  Rng " + string(TURRET_RANGE);
+    if (_obj == obj_sniper)    return "Dmg " + string(SNIPER_DMG) + "  Rng " + string(SNIPER_RANGE);
+    if (_obj == obj_cannon)    return "Dmg " + string(CANNON_DMG) + "  AoE";
+    if (_obj == obj_quicksand) return "Slows enemies";
+    if (_obj == obj_wall)      return "Blocks enemies";
+    return "";
+}
+
+function player_blocked(_px, _py) {
+    var _r = 9;
+    var _half = CELL * 0.5;
+    with (obj_building) {
+        if (kind == "offensive" || kind == "wall") {
+            var _nx = clamp(_px, x - _half, x + _half);
+            var _ny = clamp(_py, y - _half, y + _half);
+            if (point_distance(_px, _py, _nx, _ny) < _r) return true;
+        }
+    }
+    return false;
 }

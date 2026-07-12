@@ -14,6 +14,6 @@ if (point_distance(x, y, target.x, target.y) < 10) {
         target.hp -= dmg;
         target.flash = 3;
     }
-    audio_play_sound(snd_hit, 4, false, 1, 0, random_range(0.9, 1.1));
+    if (global.sfx_on) audio_play_sound(snd_hit, 4, false, 1, 0, random_range(0.9, 1.1));
     instance_destroy();
 }

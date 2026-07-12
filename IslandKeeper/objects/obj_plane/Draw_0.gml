@@ -1,0 +1,12 @@
+var _c = make_colour_rgb(125, 133, 145);
+var _dk = make_colour_rgb(78, 86, 98);
+draw_set_colour(_dk);
+draw_triangle(x - 4, y, x - 26, y - 24, x - 22, y - 2, false);
+draw_triangle(x - 4, y, x - 26, y + 24, x - 22, y + 2, false);
+draw_triangle(x - 22, y, x - 30, y - 12, x - 26, y, false);
+draw_set_colour(_c);
+draw_rectangle(x - 26, y - 5, x + 16, y + 5, false);
+draw_triangle(x + 16, y - 5, x + 16, y + 5, x + 30, y, false);
+draw_set_colour(make_colour_rgb(150, 200, 230));
+draw_circle(x + 6, y - 1, 2.5, false);
+draw_set_colour(c_white);

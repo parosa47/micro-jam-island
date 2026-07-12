@@ -12,3 +12,7 @@ rad = 9;
 col = COL_ENEMY;
 is_boss = false;
 drop = 1;
+repath_t = 0;
+kind = 0;
+anim = random(6);
+face = 90;
